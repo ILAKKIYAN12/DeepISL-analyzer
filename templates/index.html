@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeepSign AI - ISL Recognition</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-icon">🤟</span>
+    <div>
+      <h1>DeepSign AI</h1>
+      <p>Smart Indian Sign Language Recognition</p>
+    </div>
+  </div>
+  <button id="emergencyBtn" class="emergency-btn">🚨 Emergency Mode</button>
+</header>
+
+{% if not model_ready %}
+<div class="banner-warning">
+  ⚠️ No trained model found. Run <code>data_collection.py</code> then <code>train_model.py</code> before live recognition will work.
+</div>
+{% endif %}
+
+<main class="layout">
+
+  <!-- LEFT: Live feed + upload -->
+  <section class="panel video-panel">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="live">📷 Live Webcam</button>
+      <button class="tab-btn" data-tab="upload">📁 Upload Video</button>
+      <button class="tab-btn" data-tab="learn">🎓 Learning Mode</button>
+    </div>
+
+    <div id="tab-live" class="tab-content active">
+      <div class="video-frame">
+        <img src="{{ url_for('video_feed') }}" alt="Live webcam feed" id="liveFeed">
+        <div id="lowLightBadge" class="badge badge-danger hidden">⚠️ Low Light</div>
+        <div id="invalidBadge" class="badge badge-warn hidden">Invalid / Uncertain Gesture</div>
+      </div>
+      <div class="live-info">
+        <div class="stat">
+          <span class="stat-label">Current Sign</span>
+          <span class="stat-value" id="currentWord">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Confidence</span>
+          <div class="confidence-bar-track">
+            <div class="confidence-bar-fill" id="confidenceFill"></div>
+          </div>
+          <span class="stat-value" id="confidenceText">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-upload" class="tab-content">
+      <div class="upload-box">
+        <input type="file" id="videoFile" accept="video/*">
+        <button id="uploadBtn" class="btn primary">Analyze Video</button>
+      </div>
+      <div id="uploadResult" class="upload-result"></div>
+    </div>
+
+    <div id="tab-learn" class="tab-content">
+      <h3>Sign Reference</h3>
+      <p class="muted">Signs this model currently recognizes:</p>
+      <div class="sign-grid">
+        {% for sign in signs %}
+        <div class="sign-card">{{ sign.replace('_', ' ') }}</div>
+        {% else %}
+        <p class="muted">No signs trained yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: Sentence + controls + history -->
+  <section class="panel side-panel">
+    <div class="sentence-box">
+      <h3>Formed Sentence</h3>
+      <p id="sentenceText">—</p>
+      <div class="btn-row">
+        <button id="speakEnBtn" class="btn small">🔊 English</button>
+        <button id="speakTaBtn" class="btn small">🔊 தமிழ்</button>
+        <button id="resetBtn" class="btn small danger">Reset</button>
+        <button id="saveHistoryBtn" class="btn small">💾 Save</button>
+      </div>
+      <audio id="audioPlayer" class="hidden" controls></audio>
+    </div>
+
+    <div class="history-box">
+      <div class="history-header">
+        <h3>Conversation History</h3>
+        <button id="clearHistoryBtn" class="btn tiny danger">Clear</button>
+      </div>
+      <ul id="historyList" class="history-list"></ul>
+    </div>
+  </section>
+
+</main>
+
+<div id="emergencyOverlay" class="emergency-overlay hidden">
+  <div class="emergency-content">
+    <h2>🚨 EMERGENCY MODE</h2>
+    <p>Quick-access emergency phrases</p>
+    <div class="emergency-grid">
+      <button class="btn emergency-phrase" data-phrase="I need help">I need help</button>
+      <button class="btn emergency-phrase" data-phrase="Call a doctor">Call a doctor</button>
+      <button class="btn emergency-phrase" data-phrase="Call the police">Call the police</button>
+      <button class="btn emergency-phrase" data-phrase="I am in danger">I am in danger</button>
+    </div>
+    <button id="closeEmergencyBtn" class="btn">Close</button>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

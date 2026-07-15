@@ -1,0 +1,8 @@
+﻿venv/
+__pycache__/
+*.pyc
+static/audio/*.mp3
+static/audio/*.wav
+data/uploaded_temp.mp4
+data/history.db
+.DS_Store
